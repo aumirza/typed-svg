@@ -7,7 +7,7 @@ const Home: NextPage = () => {
   const [source, setSource] = useState<URL>();
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-orange-500 dark:bg-gray-600">
+    <div className="min-h-screen flex flex-col justify-between bg-green-500 dark:bg-gray-600">
       <Header />
       <main className="w-11/12 mx-auto my-5 gap-5 flex flex-col md:flex-row justify-center items-center">
         <div className="p-5 border">
