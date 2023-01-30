@@ -1,18 +1,14 @@
-import { CopyBlock, monokai } from 'react-code-blocks'
+import { CopyCode } from "../CopyCode";
 
 type Props = {
-    source: string
-}
+  source: string;
+};
 
 export const MarkdownLink: React.FC<Props> = ({ source }) => {
-
-    const code = `[![title](${source})(${source})]`
-
-    return (
-        <div className="mb-2 overflow-x-auto">
-            <h2 className='text-lg font-semibold'>Markdown</h2>
-            <CopyBlock theme={monokai} language={'markdown'} wraplines
-                text={code} />
-        </div>
-    )
-}
+  return (
+    <div className="mb-2 overflow-x-auto max-w-full overflow-hidden">
+      <h2 className="text-lg font-semibold">Markdown</h2>
+      <CopyCode>{`[![title](${source})](${source})`}</CopyCode>
+    </div>
+  );
+};

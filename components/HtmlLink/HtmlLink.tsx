@@ -1,19 +1,22 @@
-import { CopyBlock, monokai, solarizedDark } from 'react-code-blocks'
-import * as ReactDOMServer from 'react-dom/server'
+import * as ReactDOMServer from "react-dom/server";
+import { CopyCode } from "../CopyCode";
 
 type Props = {
-    source: string
-}
+  source: string;
+};
 
 export const HtmlLink: React.FC<Props> = ({ source }) => {
+  const code = (
+    <a href={source}>
+      {" "}
+      <img src={source} alt="" />
+    </a>
+  );
 
-    const code = <a href={source} > <img src={source} alt="" /></a>
-
-    return (
-        <div className='overflow-x-auto '>
-            <h2 className='text-lg font-semibold'>Html</h2>
-            <CopyBlock theme={monokai} language={'html'} wrapLines={true}
-                text={ReactDOMServer.renderToStaticMarkup(code)} />
-        </div>
-    )
-}
+  return (
+    <div className="">
+      <h2 className="text-lg font-semibold">Html</h2>
+      <CopyCode>{ReactDOMServer.renderToStaticMarkup(code)}</CopyCode>
+    </div>
+  );
+};
