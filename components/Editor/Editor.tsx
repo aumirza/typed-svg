@@ -1,125 +1,284 @@
-import React, { useEffect, useState } from "react"
-import { ColorResult, RGBColor, SketchPicker } from 'react-color'
-import { InputGroup } from "../InputGroup/InputGroup"
+import React, { useEffect, useState } from "react";
+import { ColorResult, RGBColor, SketchPicker } from "react-color";
+import { defaultSvgConfig } from "../../Constants";
+import { hexToRgb, toRgbString } from "../../utils";
+import { InputGroup } from "../InputGroup/InputGroup";
 
 type Props = {
-    setSource: React.Dispatch<React.SetStateAction<URL>> | undefined
-}
+  setSource: React.Dispatch<React.SetStateAction<URL | undefined>>;
+};
 
 export const Editor: React.FC<Props> = ({ setSource }) => {
+  const [text, setText] = useState<string>(defaultSvgConfig.text);
+  const [font, setFont] = useState<string>(defaultSvgConfig.font);
+  const [duration, setDuration] = useState<number>(defaultSvgConfig.duration);
+  const [multiline, setMultiline] = useState<boolean>(
+    defaultSvgConfig.multiline
+  );
+  const [vCenter, setVCenter] = useState<boolean>(defaultSvgConfig.vCenter);
+  const [center, setCenter] = useState<boolean>(defaultSvgConfig.center);
+  const [fontSize, setFontSize] = useState<number>(defaultSvgConfig.fontSize);
+  const [height, setHeight] = useState<number>(defaultSvgConfig.height);
+  const [width, setWidth] = useState<number>(defaultSvgConfig.width);
 
-    const [text, setText] = useState<string>('')
-    const [size, setSize] = useState('')
-    const [duration, setDuration] = useState('')
-    const [fontColor, setFontColor] = useState<RGBColor>({ r: 0, g: 0, b: 0, a: 1, })
-    const [bgColor, setBgColor] = useState<RGBColor>({ r: 255, g: 255, b: 255, a: 1, })
+  const [color, setColor] = useState<string>(defaultSvgConfig.color);
+  const [background, setBackground] = useState<string>(
+    defaultSvgConfig.background
+  );
 
-    const [showFontColor, setShowFontColor] = useState(false)
-    const [showBgColor, setShowBgColor] = useState(false)
+  const [fontColor, setFontColor] = useState<RGBColor>(hexToRgb(color));
+  const [bgColor, setBgColor] = useState<RGBColor>(hexToRgb(background));
 
-    const handleFontColorChange = (color: ColorResult) => setFontColor(color.rgb)
-    const handleBgColorChange = (color: ColorResult) => setBgColor(color.rgb)
+  const [showFontColorPicker, setShowFontColorPicker] =
+    useState<boolean>(false);
+  const [showBgColorPicker, setShowBgColorPicker] = useState<boolean>(false);
 
-    const toRgbString = (rgb: RGBColor) => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b},${rgb.a})`
+  const handleFontColorClick = () =>
+    setShowFontColorPicker(!showFontColorPicker);
+  const handleBgColorClick = () => setShowBgColorPicker(!showBgColorPicker);
 
+  const handleFontColorClose = () => setShowFontColorPicker(false);
+  const handleBgColorClose = () => setShowBgColorPicker(false);
 
+  useEffect(() => {
+    if (showFontColorPicker) {
+      document.addEventListener("click", handleFontColorClose);
+      document.addEventListener("touchstart", handleFontColorClose);
+      document.addEventListener("keydown", handleFontColorClose);
 
-    useEffect(() => {
-        // create url and params
-        const baseUrl = window.location.origin
-        const sourceUrl = new URL(`${baseUrl}/api/svg`)
+      document.addEventListener("click", handleBgColorClose);
+      document.addEventListener("touchstart", handleBgColorClose);
+      document.addEventListener("keydown", handleBgColorClose);
+    } else {
+      document.removeEventListener("click", handleFontColorClose);
+      document.removeEventListener("touchstart", handleFontColorClose);
+      document.removeEventListener("keydown", handleFontColorClose);
 
-        const params = {
-            size: size,
-            text: text,
-            duration: duration,
-            fontColor: toRgbString(fontColor),
-            bgColor: toRgbString(bgColor),
-        };
+      document.removeEventListener("click", handleBgColorClose);
+      document.removeEventListener("touchstart", handleBgColorClose);
+      document.removeEventListener("keydown", handleBgColorClose);
+    }
+    return () => {
+      document.removeEventListener("click", handleFontColorClose);
+      document.removeEventListener("touchstart", handleFontColorClose);
+      document.removeEventListener("keydown", handleFontColorClose);
 
-        (Object.keys(params) as (keyof typeof params)[])
-            .forEach(key => {
-                const val = params[key]
-                if (val) sourceUrl.searchParams.append(key, val)
-            })
+      document.removeEventListener("click", handleBgColorClose);
+      document.removeEventListener("touchstart", handleBgColorClose);
+      document.removeEventListener("keydown", handleBgColorClose);
+    };
+  }, [showFontColorPicker, showBgColorPicker]);
 
-        setSource ? setSource(sourceUrl) : ''
-    }, [text, size, duration, fontColor, bgColor])
+  const handleFontColorChange = (color: ColorResult) => setFontColor(color.rgb);
+  const handleBgColorChange = (color: ColorResult) => setBgColor(color.rgb);
 
+  const handleFontChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
+    setFont(e.target.value);
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+    setText(e.target.value);
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDuration(parseInt(e.target.value));
+  const handleMultilineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setMultiline(e.target.value === "true" ? true : false);
+  };
 
-    return (
-        <div className="bg-slate-700 p-5">
-            <div className="">
-                <h2 className="text-xl pb-1 mb-1 border-b text-white"  >Add Your Text</h2>
-                <textarea onChange={(e) => setText(e.target.value)} defaultValue={'The Fox is brown'} className="w-full rounded border-none" />
-            </div>
+  const handleVCenterChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setVCenter(e.target.checked);
+  const handleCenterChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setCenter(e.target.checked);
+  const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setFontSize(parseInt(e.target.value));
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setHeight(parseInt(e.target.value));
+  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setWidth(parseInt(e.target.value));
 
-            <div>
+  useEffect(() => {
+    const background = toRgbString(bgColor);
+    setBackground(background);
+  }, [bgColor]);
 
-                <h2 className="text-xl text-white pb-1 mb-1 border-b">Configuration</h2>
+  useEffect(() => {
+    const colour = toRgbString(fontColor);
+    setColor(colour);
+  }, [fontColor]);
 
-                <InputGroup label='Font'>
-                    <select onChange={e => console.log(e)}>
-                        <option value="Poppins">Poppins</option>
-                        {/* Google fonts name */}
-                    </select>
-                </InputGroup>
+  useEffect(() => {
+    // create url and params
+    const baseUrl = window.location.origin;
+    const sourceUrl = new URL(`${baseUrl}/api/svg`);
 
-                <InputGroup label='Size'>
-                    <input onChange={(e) => setSize(e.target.value)} defaultValue='30' className="w-1/2 border" type="number" />
-                </InputGroup>
+    const params = {
+      text,
+      font,
+      duration,
+      multiline,
+      vCenter,
+      center,
+      fontSize,
+      height,
+      width,
+      background,
+      color,
+    };
 
-                <InputGroup label='Duration'>
-                    <div className="w-1/2 flex">
-                        <input onChange={(e) => setDuration(e.target.value)} defaultValue='1000' step='100' className="w-11/12 border" type="number" />
-                        <div className="bg-white">Ms</div>
-                    </div>
-                </InputGroup>
+    const getKeyValue = <T, K extends keyof T>(obj: T, key: K): T[K] =>
+      obj[key];
 
-                <InputGroup label="color">
-                    <div className="p-0.5 border">
-                        <div onClick={() => setShowFontColor(!showFontColor)} style={{ background: toRgbString(fontColor) }} className="w-36 h-5"></div>
-                    </div>
-                    {showFontColor ?
-                        <SketchPicker className="absolute z-10" color={fontColor} onChange={handleFontColorChange} />
-                        : ''}
-                </InputGroup>
+    Object.keys(params).forEach((key) => {
+      const value = getKeyValue(params, key as keyof typeof params);
+      if (value) {
+        sourceUrl.searchParams.append(key, value.toString());
+      }
+    });
 
-                <InputGroup label="Background Color">
-                    <div className="p-0.5 border">
-                        <div onClick={() => setShowBgColor(!showBgColor)} style={{ background: toRgbString(bgColor) }} className="w-36 h-5"></div>
-                    </div>
-                    {showBgColor ?
-                        <SketchPicker className="absolute z-10" color={bgColor} onChange={handleBgColorChange} />
-                        : ''}
-                </InputGroup>
+    setSource ? setSource(sourceUrl) : "";
+  }, [
+    font,
+    text,
+    duration,
+    multiline,
+    vCenter,
+    center,
+    fontSize,
+    height,
+    width,
+    background,
+    color,
+    setSource,
+  ]);
 
-                <InputGroup label='Horizontal Centered'>
-                    <input className="w-1/2 border" type="checkbox" name="" id="" />
-                </InputGroup>
+  return (
+    <div className="bg-slate-700 p-5">
+      <div className="">
+        <h2 className="text-xl pb-1 mb-1 border-b text-white">Add Your Text</h2>
+        <textarea
+          onChange={handleTextChange}
+          defaultValue={"The Fox is brown"}
+          className="w-full rounded border-none"
+        />
+      </div>
 
-                <InputGroup label='Vertically Centered'>
-                    <input className="w-1/2 border" type="checkbox" name="" id="" />
-                </InputGroup>
+      <div>
+        <h2 className="text-xl text-white pb-1 mb-1 border-b">Configuration</h2>
 
+        <InputGroup label="Font">
+          <select onChange={handleFontChange}>{/* Google fonts name */}</select>
+        </InputGroup>
 
-                <InputGroup label='Multiline'>
-                    <select className="w-1/2 border" name="" id="">
-                        <option value="">New line</option>
-                        <option value="">same line</option>
-                    </select>
-                </InputGroup>
+        <InputGroup label="Font Size">
+          <input
+            onChange={handleFontSizeChange}
+            value={fontSize}
+            className="w-1/2 border"
+            type="number"
+          />
+        </InputGroup>
 
-                <InputGroup label='Dimension(WxH)'>
-                    <div className="flex w-1/2 relative">
-                        <input className="w-[46%] border" type="number" />
-                        <span> X </span>
-                        <input className="w-[46%] border" type="number" />
-                    </div>
-                </InputGroup>
+        <InputGroup label="Duration">
+          <div className="w-1/2 flex">
+            <input
+              onChange={handleDurationChange}
+              value={duration}
+              step="100"
+              className="w-11/12 border"
+              type="number"
+            />
+            <div className="bg-white">Ms</div>
+          </div>
+        </InputGroup>
 
-            </div>
+        <InputGroup label="color">
+          <div className="p-0.5 border">
+            <div
+              onClick={handleFontColorClick}
+              style={{ background: color }}
+              className="w-36 h-5"
+            ></div>
+          </div>
+          {showFontColorPicker ? (
+            <SketchPicker
+              className="absolute z-10"
+              color={fontColor}
+              onChange={handleFontColorChange}
+            />
+          ) : (
+            ""
+          )}
+        </InputGroup>
 
-        </div>
-    )
-}
+        <InputGroup label="Background Color">
+          <div className="p-0.5 border">
+            <div
+              onClick={handleBgColorClick}
+              style={{ background: background }}
+              className="w-36 h-5"
+            ></div>
+          </div>
+          {showBgColorPicker ? (
+            <SketchPicker
+              className="absolute z-10"
+              color={bgColor}
+              onChange={handleBgColorChange}
+            />
+          ) : (
+            ""
+          )}
+        </InputGroup>
+
+        <InputGroup label="Horizontal Centered">
+          <input
+            onChange={handleCenterChange}
+            checked={center}
+            className="w-1/2 border"
+            type="checkbox"
+            name=""
+            id=""
+          />
+        </InputGroup>
+
+        <InputGroup label="Vertically Centered">
+          <input
+            onChange={handleVCenterChange}
+            checked={vCenter}
+            className="w-1/2 border"
+            type="checkbox"
+            name=""
+            id=""
+          />
+        </InputGroup>
+
+        <InputGroup label="Multiline">
+          <select
+            onChange={handleMultilineChange}
+            value={multiline ? "true" : "false"}
+            className="w-1/2 border"
+            name=""
+            id=""
+          >
+            <option value="true">New line</option>
+            <option value="false">same line</option>
+          </select>
+        </InputGroup>
+
+        <InputGroup label="Dimension(WxH)">
+          <div className="flex w-1/2 relative">
+            <input
+              className="w-[46%] border"
+              type="number"
+              onChange={handleWidthChange}
+              value={width}
+            />
+            <span> X </span>
+            <input
+              className="w-[46%] border"
+              type="number"
+              onChange={handleHeightChange}
+              value={height}
+            />
+          </div>
+        </InputGroup>
+      </div>
+    </div>
+  );
+};
