@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { MarkdownLink, HtmlLink } from "../../components";
 
 type Props = {
@@ -8,7 +7,7 @@ type Props = {
 export const Preview: React.FC<Props> = ({ source }) => {
   return (
     <div>
-      <Image
+      <img
         src={source.toString() ?? ""}
         width={400}
         height={60}
